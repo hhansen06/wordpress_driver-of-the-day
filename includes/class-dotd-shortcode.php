@@ -97,10 +97,19 @@ class DOTD_Shortcode {
 		static $instance = 0;
 		$instance++;
 		$widget_id = 'dotd-widget-' . $instance;
+		$widget_style = '';
+
+		// Bam theme exposes primary color via theme mod (not CSS variable).
+		if ( get_stylesheet() === 'bam' || get_template() === 'bam' ) {
+			$bam_primary = sanitize_hex_color( (string) get_theme_mod( 'bam_primary_color', '#ff4f4f' ) );
+			if ( ! empty( $bam_primary ) ) {
+				$widget_style = '--dotd-primary:' . $bam_primary . ';';
+			}
+		}
 
 		ob_start();
 		?>
-		<div id="<?php echo esc_attr( $widget_id ); ?>" class="dotd-widget" aria-live="polite">
+		<div id="<?php echo esc_attr( $widget_id ); ?>" class="dotd-widget" style="<?php echo esc_attr( $widget_style ); ?>" aria-live="polite">
 			<noscript><?php esc_html_e( 'JavaScript muss aktiviert sein, um an der Abstimmung teilzunehmen.', 'driver-of-the-day' ); ?></noscript>
 		</div>
 		<script>
