@@ -1,0 +1,18 @@
+/* Driver of the Day — Admin Styles */
+
+.wrap .dotd-results-table td,
+.wrap .dotd-results-table th {
+	vertical-align: middle;
+}
+
+/* Slightly emphasise the delete button */
+.button.button-delete {
+	color: #b32d2e;
+	border-color: #b32d2e;
+}
+
+.button.button-delete:hover {
+	background: #b32d2e;
+	color: #fff;
+	border-color: #b32d2e;
+}

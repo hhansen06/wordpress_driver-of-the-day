@@ -1,0 +1,293 @@
+/* ============================================================
+   Driver of the Day — Frontend Styles
+   ============================================================ */
+
+/* Root variables */
+.dotd-widget {
+	--dotd-accent:      #e8390e;
+	--dotd-accent-dark: #b82d0b;
+	--dotd-bg:          #1a1a1a;
+	--dotd-card-bg:     #242424;
+	--dotd-card-hover:  #2e2e2e;
+	--dotd-card-select: #3a1a10;
+	--dotd-border:      #3a3a3a;
+	--dotd-text:        #f0f0f0;
+	--dotd-muted:       #9a9a9a;
+	--dotd-radius:      10px;
+	--dotd-gap:         1rem;
+
+	box-sizing: border-box;
+	font-family: inherit;
+	color: var(--dotd-text);
+	background: var(--dotd-bg);
+	border-radius: var(--dotd-radius);
+	padding: 1.5rem;
+	margin: 1.5rem 0;
+}
+
+.dotd-widget *,
+.dotd-widget *::before,
+.dotd-widget *::after {
+	box-sizing: inherit;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.dotd-header {
+	text-align: center;
+	margin-bottom: 1.5rem;
+}
+
+.dotd-title {
+	font-size: 1.75rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	color: var(--dotd-accent);
+	text-transform: uppercase;
+	margin: 0 0 0.25rem;
+}
+
+.dotd-subtitle {
+	font-size: 1rem;
+	color: var(--dotd-muted);
+	margin: 0;
+}
+
+.dotd-event-name {
+	font-size: 0.9rem;
+	color: var(--dotd-muted);
+	margin-top: 0.4rem;
+	font-style: italic;
+}
+
+/* ── Status messages ─────────────────────────────────────── */
+.dotd-status-msg {
+	text-align: center;
+	padding: 1.25rem;
+	border: 1px solid var(--dotd-border);
+	border-radius: var(--dotd-radius);
+	color: var(--dotd-muted);
+	font-size: 1rem;
+}
+
+.dotd-status-msg.is-voted {
+	border-color: var(--dotd-accent);
+	color: var(--dotd-text);
+}
+
+.dotd-error {
+	color: #ff6b6b;
+	background: rgba(255, 107, 107, 0.1);
+	padding: 0.75rem 1rem;
+	border-radius: 6px;
+	text-align: center;
+}
+
+/* ── Participant grid ────────────────────────────────────── */
+.dotd-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: var(--dotd-gap);
+	margin-bottom: 1.25rem;
+}
+
+/* ── Participant card ────────────────────────────────────── */
+.dotd-card {
+	background: var(--dotd-card-bg);
+	border: 2px solid var(--dotd-border);
+	border-radius: var(--dotd-radius);
+	padding: 1rem;
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, transform 0.1s;
+	position: relative;
+	user-select: none;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.dotd-card:hover {
+	border-color: var(--dotd-accent);
+	background: var(--dotd-card-hover);
+	transform: translateY(-2px);
+}
+
+.dotd-card.is-selected {
+	border-color: var(--dotd-accent);
+	background: var(--dotd-card-select);
+	box-shadow: 0 0 0 3px rgba(232, 57, 14, 0.35);
+}
+
+/* results mode: not interactive */
+.dotd-widget.is-results .dotd-card {
+	cursor: default;
+}
+
+.dotd-widget.is-results .dotd-card:hover {
+	transform: none;
+}
+
+.dotd-card-nr {
+	font-size: 1.6rem;
+	font-weight: 900;
+	color: var(--dotd-accent);
+	line-height: 1;
+}
+
+.dotd-card-driver {
+	font-size: 1rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.dotd-card-codriver {
+	font-size: 0.8rem;
+	color: var(--dotd-muted);
+}
+
+.dotd-card-vehicle {
+	font-size: 0.78rem;
+	color: var(--dotd-muted);
+	margin-top: 0.1rem;
+}
+
+.dotd-card-klasse {
+	display: inline-block;
+	font-size: 0.7rem;
+	font-weight: 700;
+	background: rgba(232, 57, 14, 0.15);
+	color: var(--dotd-accent);
+	border: 1px solid rgba(232, 57, 14, 0.4);
+	border-radius: 4px;
+	padding: 1px 6px;
+	margin-top: auto;
+	width: fit-content;
+}
+
+/* ── Vote bar (results mode) ─────────────────────────────── */
+.dotd-bar-wrap {
+	margin-top: 0.5rem;
+}
+
+.dotd-bar-track {
+	background: var(--dotd-border);
+	border-radius: 4px;
+	height: 8px;
+	overflow: hidden;
+	margin-bottom: 3px;
+}
+
+.dotd-bar-fill {
+	height: 100%;
+	background: var(--dotd-accent);
+	border-radius: 4px;
+	transition: width 0.6s ease;
+	width: 0;
+}
+
+.dotd-bar-label {
+	font-size: 0.75rem;
+	color: var(--dotd-muted);
+	display: flex;
+	justify-content: space-between;
+}
+
+/* highlight winner in results */
+.dotd-card.is-winner {
+	border-color: gold;
+	background: rgba(255, 215, 0, 0.08);
+}
+
+.dotd-card.is-winner .dotd-bar-fill {
+	background: gold;
+}
+
+.dotd-winner-badge {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	font-size: 1.2rem;
+	line-height: 1;
+}
+
+/* ── Action bar ──────────────────────────────────────────── */
+.dotd-action-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-top: 1rem;
+	flex-wrap: wrap;
+}
+
+.dotd-btn {
+	padding: 0.6rem 1.4rem;
+	border: none;
+	border-radius: 6px;
+	font-size: 0.95rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 0.15s, opacity 0.15s;
+}
+
+.dotd-btn-primary {
+	background: var(--dotd-accent);
+	color: #fff;
+}
+
+.dotd-btn-primary:hover:not(:disabled) {
+	background: var(--dotd-accent-dark);
+}
+
+.dotd-btn-primary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.dotd-btn-secondary {
+	background: transparent;
+	color: var(--dotd-muted);
+	border: 1px solid var(--dotd-border);
+}
+
+.dotd-btn-secondary:hover {
+	color: var(--dotd-text);
+	border-color: var(--dotd-text);
+}
+
+.dotd-select-hint {
+	font-size: 0.85rem;
+	color: var(--dotd-muted);
+}
+
+/* ── Results footer ──────────────────────────────────────── */
+.dotd-results-footer {
+	text-align: center;
+	margin-top: 1rem;
+	font-size: 0.85rem;
+	color: var(--dotd-muted);
+}
+
+/* ── Loading spinner ─────────────────────────────────────── */
+.dotd-loading {
+	text-align: center;
+	padding: 2rem;
+	color: var(--dotd-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+	.dotd-widget {
+		padding: 1rem;
+	}
+	.dotd-title {
+		font-size: 1.4rem;
+	}
+	.dotd-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 320px) {
+	.dotd-grid {
+		grid-template-columns: 1fr;
+	}
+}
