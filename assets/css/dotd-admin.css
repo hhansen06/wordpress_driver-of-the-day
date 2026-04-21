@@ -16,29 +16,3 @@
 	color: #fff;
 	border-color: #b32d2e;
 }
-
-.dotd-class-order-list {
-	margin: 0;
-	padding: 0;
-	max-width: 480px;
-}
-
-.dotd-class-order-item {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 10px;
-	margin: 0 0 6px;
-	border: 1px solid #dcdcde;
-	background: #fff;
-	border-radius: 4px;
-	cursor: move;
-}
-
-.dotd-class-order-item .dashicons {
-	color: #646970;
-}
-
-.dotd-class-order-label {
-	font-weight: 600;
-}

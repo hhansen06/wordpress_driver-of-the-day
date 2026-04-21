@@ -48,11 +48,6 @@ class DOTD_Admin {
 			'default'           => '',
 			'sanitize_callback' => 'sanitize_text_field',
 		] );
-		register_setting( self::OPTION_GROUP, 'dotd_class_order', [
-			'type'              => 'array',
-			'default'           => [],
-			'sanitize_callback' => [ __CLASS__, 'sanitize_class_order' ],
-		] );
 
 		// Section: API
 		add_settings_section(
@@ -79,45 +74,6 @@ class DOTD_Admin {
 			self::MENU_SLUG,
 			'dotd_api_section'
 		);
-
-		add_settings_section(
-			'dotd_sort_section',
-			__( 'Sortierung', 'driver-of-the-day' ),
-			static function () {
-				echo '<p>' . esc_html__( 'Klassenreihenfolge für Buttons im Frontend festlegen. Innerhalb jeder Klasse wird numerisch nach Startnummer sortiert.', 'driver-of-the-day' ) . '</p>';
-			},
-			self::MENU_SLUG
-		);
-
-		add_settings_field(
-			'dotd_class_order',
-			__( 'Klassenreihenfolge', 'driver-of-the-day' ),
-			[ __CLASS__, 'field_class_order' ],
-			self::MENU_SLUG,
-			'dotd_sort_section'
-		);
-	}
-
-	/**
-	 * Sanitizes class order submitted from admin settings.
-	 *
-	 * @param mixed $value
-	 * @return string[]
-	 */
-	public static function sanitize_class_order( $value ): array {
-		if ( ! is_array( $value ) ) {
-			return [];
-		}
-
-		$sanitized = [];
-		foreach ( $value as $class_name ) {
-			$class_name = trim( sanitize_text_field( (string) $class_name ) );
-			if ( $class_name !== '' ) {
-				$sanitized[] = $class_name;
-			}
-		}
-
-		return array_values( array_unique( $sanitized ) );
 	}
 
 	public static function field_event_id(): void {
@@ -136,27 +92,6 @@ class DOTD_Admin {
 			esc_attr( $value )
 		);
 		echo '<p class="description">' . esc_html__( 'Bearer-Token für den API-Zugriff. Wird verschlüsselt gespeichert.', 'driver-of-the-day' ) . '</p>';
-	}
-
-	public static function field_class_order(): void {
-		$event_id = absint( get_option( 'dotd_event_id', 1 ) );
-		$classes = DOTD_API::get_class_order_for_event( $event_id );
-
-		if ( empty( $classes ) ) {
-			echo '<p class="description">' . esc_html__( 'Keine Klassen verfügbar. Bitte Event-ID/Bearer-Token prüfen und speichern.', 'driver-of-the-day' ) . '</p>';
-			return;
-		}
-
-		echo '<ul id="dotd-class-order-sortable" class="dotd-class-order-list">';
-		foreach ( $classes as $class_name ) {
-			echo '<li class="dotd-class-order-item">'
-				. '<span class="dashicons dashicons-move" aria-hidden="true"></span>'
-				. '<span class="dotd-class-order-label">' . esc_html( $class_name ) . '</span>'
-				. '<input type="hidden" name="dotd_class_order[]" value="' . esc_attr( $class_name ) . '">'
-				. '</li>';
-		}
-		echo '</ul>';
-		echo '<p class="description">' . esc_html__( 'Per Drag & Drop sortieren. Diese Reihenfolge wird für die Buttons verwendet.', 'driver-of-the-day' ) . '</p>';
 	}
 
 	/** Renders the full admin page. */
@@ -306,13 +241,6 @@ class DOTD_Admin {
 			DOTD_PLUGIN_URL . 'assets/css/dotd-admin.css',
 			[],
 			DOTD_VERSION
-		);
-		wp_enqueue_script(
-			'dotd-admin',
-			DOTD_PLUGIN_URL . 'assets/js/dotd-admin.js',
-			[ 'jquery', 'jquery-ui-sortable' ],
-			DOTD_VERSION,
-			true
 		);
 	}
 }
