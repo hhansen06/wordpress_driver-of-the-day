@@ -99,9 +99,12 @@ class DOTD_Shortcode {
 		$widget_id = 'dotd-widget-' . $instance;
 		$widget_style = '';
 
-		// Bam theme exposes primary color via theme mod (not CSS variable).
+		// Bam theme exposes the article link color via theme mod (not CSS variable).
 		if ( get_stylesheet() === 'bam' || get_template() === 'bam' ) {
-			$bam_primary = sanitize_hex_color( (string) get_theme_mod( 'bam_primary_color', '#ff4f4f' ) );
+			$bam_primary = sanitize_hex_color( (string) get_theme_mod( 'bam_link_color', '#00aeef' ) );
+			if ( empty( $bam_primary ) ) {
+				$bam_primary = sanitize_hex_color( (string) get_theme_mod( 'bam_primary_color', '#ff4f4f' ) );
+			}
 			if ( ! empty( $bam_primary ) ) {
 				$widget_style = '--dotd-primary:' . $bam_primary . ';';
 			}
