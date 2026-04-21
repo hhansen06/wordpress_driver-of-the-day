@@ -124,6 +124,17 @@
 	color: var(--dotd-primary);
 }
 
+.dotd-card-vote-btn {
+	margin-top: 0.55rem;
+	width: 100%;
+	text-align: center;
+	display: none;
+}
+
+.dotd-card.is-selected .dotd-card-vote-btn {
+	display: inline-block;
+}
+
 .dotd-bar-wrap {
 	margin-top: 0.45rem;
 }

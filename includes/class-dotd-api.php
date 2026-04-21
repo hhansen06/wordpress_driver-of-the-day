@@ -71,6 +71,117 @@ class DOTD_API {
 		return $event['participants'];
 	}
 
+	/**
+	 * Returns saved class order from admin settings.
+	 *
+	 * @return string[]
+	 */
+	public static function get_saved_class_order(): array {
+		$raw = get_option( 'dotd_class_order', [] );
+		if ( ! is_array( $raw ) ) {
+			return [];
+		}
+
+		$order = [];
+		foreach ( $raw as $class_name ) {
+			$class_name = trim( sanitize_text_field( (string) $class_name ) );
+			if ( $class_name !== '' ) {
+				$order[] = $class_name;
+			}
+		}
+
+		return array_values( array_unique( $order ) );
+	}
+
+	/**
+	 * Returns class order for a specific event.
+	 * Saved order is respected; unknown/new classes are appended.
+	 *
+	 * @return string[]
+	 */
+	public static function get_class_order_for_event( int $event_id ): array {
+		$saved_order = self::get_saved_class_order();
+		$participants = self::get_participants( $event_id );
+
+		if ( ! is_array( $participants ) || empty( $participants ) ) {
+			return $saved_order;
+		}
+
+		$classes = [];
+		foreach ( $participants as $p ) {
+			$class_name = trim( sanitize_text_field( (string) ( $p['klasse'] ?? '' ) ) );
+			if ( $class_name !== '' ) {
+				$classes[] = $class_name;
+			}
+		}
+
+		$classes = array_values( array_unique( $classes ) );
+		natcasesort( $classes );
+		$classes = array_values( $classes );
+
+		$ordered = [];
+		foreach ( $saved_order as $class_name ) {
+			if ( in_array( $class_name, $classes, true ) ) {
+				$ordered[] = $class_name;
+			}
+		}
+
+		foreach ( $classes as $class_name ) {
+			if ( ! in_array( $class_name, $ordered, true ) ) {
+				$ordered[] = $class_name;
+			}
+		}
+
+		return $ordered;
+	}
+
+	/**
+	 * Sort participants by class order first, then numerically by start number.
+	 *
+	 * @param array[] $participants
+	 * @return array[]
+	 */
+	public static function sort_participants( array $participants, int $event_id ): array {
+		$class_order = self::get_class_order_for_event( $event_id );
+		$rank_map = [];
+		foreach ( $class_order as $index => $class_name ) {
+			$rank_map[ $class_name ] = $index;
+		}
+
+		usort( $participants, static function ( array $a, array $b ) use ( $rank_map ) {
+			$class_a = trim( sanitize_text_field( (string) ( $a['klasse'] ?? '' ) ) );
+			$class_b = trim( sanitize_text_field( (string) ( $b['klasse'] ?? '' ) ) );
+
+			$rank_a = $rank_map[ $class_a ] ?? PHP_INT_MAX;
+			$rank_b = $rank_map[ $class_b ] ?? PHP_INT_MAX;
+
+			if ( $rank_a !== $rank_b ) {
+				return $rank_a <=> $rank_b;
+			}
+
+			$start_a = self::start_nr_to_int( (string) ( $a['start_nr'] ?? '' ) );
+			$start_b = self::start_nr_to_int( (string) ( $b['start_nr'] ?? '' ) );
+
+			if ( $start_a !== $start_b ) {
+				return $start_a <=> $start_b;
+			}
+
+			$driver_a = (string) ( $a['driver_name'] ?? '' );
+			$driver_b = (string) ( $b['driver_name'] ?? '' );
+			return strnatcasecmp( $driver_a, $driver_b );
+		} );
+
+		return $participants;
+	}
+
+	/** Converts a start number string to an integer for proper numeric sorting. */
+	private static function start_nr_to_int( string $start_nr ): int {
+		if ( preg_match( '/\d+/', $start_nr, $m ) ) {
+			return (int) $m[0];
+		}
+		return PHP_INT_MAX;
+	}
+
 	/** Clears the cached event data for the given event. */
 	public static function clear_cache( int $event_id ): void {
 		delete_transient( sprintf( self::CACHE_KEY, $event_id ) );

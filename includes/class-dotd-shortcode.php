@@ -54,6 +54,9 @@ class DOTD_Shortcode {
 
 		$already_voted = ( $phase === 'open' ) && DOTD_Vote::visitor_has_voted( $event_id );
 		$participants  = $event['participants'] ?? [];
+		if ( ! empty( $participants ) ) {
+			$participants = DOTD_API::sort_participants( $participants, $event_id );
+		}
 
 		// Fetch results only when needed (already voted, or voting closed)
 		$results = [];

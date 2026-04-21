@@ -137,18 +137,23 @@
 
 	function renderVotingForm(widgetEl, d, t) {
 		var selectedId = null;
-
 		var grid = el('div', 'dotd-grid');
 		widgetEl.appendChild(grid);
 
-		var cards = [];
+		var errorEl = el('p', 'dotd-error');
+		errorEl.style.display = 'none';
+		widgetEl.appendChild(errorEl);
 
 		d.participants.forEach(function (p) {
 			var card = buildCard(p, true);
 			grid.appendChild(card);
-			cards.push(card);
 
-			function selectCard() {
+			var voteBtn = el('button', 'dotd-btn dotd-btn-primary dotd-card-vote-btn', t.btnVote);
+			voteBtn.type = 'button';
+			card.appendChild(voteBtn);
+
+			function markSelected() {
+				var cards = grid.querySelectorAll('.dotd-card');
 				cards.forEach(function (c) {
 					c.classList.remove('is-selected');
 					c.setAttribute('aria-pressed', 'false');
@@ -156,37 +161,37 @@
 				card.classList.add('is-selected');
 				card.setAttribute('aria-pressed', 'true');
 				selectedId = parseInt(p.id, 10);
-				confirmBtn.disabled = false;
-				hint.style.display = 'none';
 			}
 
-			card.addEventListener('click', selectCard);
+			function handleCardVoteFlow() {
+				var participantId = parseInt(p.id, 10);
+				if (selectedId !== participantId) {
+					markSelected();
+					return;
+				}
+				submitVote(d, participantId, widgetEl, voteBtn, errorEl, t);
+			}
+
+			card.addEventListener('click', handleCardVoteFlow);
 			card.addEventListener('keydown', function (e) {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();
-					selectCard();
+					handleCardVoteFlow();
 				}
 			});
+
+			voteBtn.addEventListener('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				submitVote(d, parseInt(p.id, 10), widgetEl, voteBtn, errorEl, t);
+			});
 		});
+	}
 
-		// Action bar
-		var actionBar = el('div', 'dotd-action-bar');
-		var hint = el('span', 'dotd-select-hint', t.selectPrompt);
-		var confirmBtn = el('button', 'dotd-btn dotd-btn-primary', t.btnVote);
-		confirmBtn.type = 'button';
-		confirmBtn.disabled = true;
-
-		actionBar.appendChild(hint);
-		actionBar.appendChild(confirmBtn);
-		widgetEl.appendChild(actionBar);
-
-		var errorEl = el('p', 'dotd-error');
-		errorEl.style.display = 'none';
-		widgetEl.appendChild(errorEl);
-
-		confirmBtn.addEventListener('click', function () {
-			if (!selectedId) return;
-			submitVote(d, selectedId, widgetEl, confirmBtn, errorEl, t);
+	function setCardButtonsDisabled(widgetEl, disabled) {
+		var buttons = widgetEl.querySelectorAll('.dotd-card-vote-btn');
+		buttons.forEach(function (button) {
+			button.disabled = disabled;
 		});
 	}
 
@@ -195,7 +200,7 @@
 	// -------------------------------------------------------------------------
 
 	function submitVote(d, participantId, widgetEl, btn, errorEl, t) {
-		btn.disabled = true;
+		setCardButtonsDisabled(widgetEl, true);
 		errorEl.style.display = 'none';
 
 		var body = new URLSearchParams();
@@ -229,14 +234,14 @@
 					} else {
 						errorEl.textContent  = msg;
 						errorEl.style.display = 'block';
-						btn.disabled = false;
+						setCardButtonsDisabled(widgetEl, false);
 					}
 				}
 			})
 			.catch(function () {
 				errorEl.textContent  = t.errorGeneric;
 				errorEl.style.display = 'block';
-				btn.disabled = false;
+				setCardButtonsDisabled(widgetEl, false);
 			});
 	}
 
