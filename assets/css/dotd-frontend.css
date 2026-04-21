@@ -82,12 +82,20 @@
 	box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 18%, transparent);
 }
 
-.dotd-widget.is-results .dotd-card {
+.dotd-widget.is-results .dotd-card,
+.dotd-widget.is-voted-state .dotd-grid {
+	margin-top: 1rem;
+}
+
+.dotd-widget.is-voted-state .dotd-card {
 	cursor: default;
 }
 
-.dotd-widget.is-results .dotd-card:hover {
+.dotd-widget.is-results .dotd-card:hover,
+.dotd-widget.is-voted-state .dotd-card:hover {
 	transform: none;
+	border-color: var(--dotd-border);
+	background: transparent;
 }
 
 .dotd-card-nr {

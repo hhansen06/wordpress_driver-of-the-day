@@ -123,12 +123,26 @@
 		if (d.alreadyVoted) {
 			var voted = el('div', 'dotd-status-msg is-voted', t.alreadyVoted);
 			widgetEl.appendChild(voted);
-			renderResults(widgetEl, d, false, t);
+			renderVotedCards(widgetEl, d);
 			return;
 		}
 
 		// --- Phase: open, not yet voted ---
 		renderVotingForm(widgetEl, d, t);
+	}
+
+	// -------------------------------------------------------------------------
+	// Already-voted card grid (no interactivity, no vote counts)
+	// -------------------------------------------------------------------------
+
+	function renderVotedCards(widgetEl, d) {
+		widgetEl.classList.add('is-voted-state');
+		var grid = el('div', 'dotd-grid');
+		widgetEl.appendChild(grid);
+		d.participants.forEach(function (p) {
+			var card = buildCard(p, false);
+			grid.appendChild(card);
+		});
 	}
 
 	// -------------------------------------------------------------------------
@@ -218,18 +232,12 @@
 			.then(function (resp) { return resp.json(); })
 			.then(function (json) {
 				if (json.success) {
-					// Update local data and re-render as results
-					d.alreadyVoted      = true;
-					d.results           = json.data.results;
-					d.total             = json.data.total;
-					d.votedParticipantId = json.data.participant_id;
+					d.alreadyVoted = true;
 					renderWidget({ widgetId: widgetEl.id, data: d });
 				} else {
 					var msg = (json.data && json.data.message) ? json.data.message : t.errorGeneric;
 					if (json.data && json.data.already_voted) {
 						d.alreadyVoted = true;
-						d.results = {};
-						d.total   = 0;
 						renderWidget({ widgetId: widgetEl.id, data: d });
 					} else {
 						errorEl.textContent  = msg;
@@ -251,10 +259,6 @@
 
 	function renderResults(widgetEl, d, isFinal, t) {
 		widgetEl.classList.add('is-results');
-
-		var resultsHeader = el('h3', 'dotd-results-headline',
-			isFinal ? t.votingClosed : t.resultsHeadline);
-		widgetEl.appendChild(resultsHeader);
 
 		var results = d.results || {};
 		var total   = d.total   || 0;
